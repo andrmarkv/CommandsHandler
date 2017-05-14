@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:columnCount="3"
+    android:columnOrderPreserved="true"
+    android:rowCount="3"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/startService"
+        android:layout_width="100dp"
+        android:layout_gravity="fill_horizontal"
+        android:layout_column="0"
+        android:layout_row="0"
+        android:onClick="onClickStart"
+        android:text="@string/startService"></Button>
+
+    <Button
+        android:id="@+id/stopService"
+        android:layout_width="100dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:onClick="onClickStop"
+        android:text="@string/stopService"
+        android:layout_row="0"
+        android:layout_column="1" />
+
+    <Button
+        android:id="@+id/checkService"
+        android:layout_width="100dp"
+        android:layout_gravity="fill_horizontal"
+        android:layout_height="wrap_content"
+        android:onClick="onClickStatus"
+        android:text="@string/checkService"
+        android:layout_row="0"
+        android:layout_column="2">
+    </Button>
+
+    <EditText
+        android:id="@+id/ipAddr"
+        android:layout_height="wrap_content"
+        android:layout_columnSpan="2"
+        android:layout_gravity="fill"
+        android:layout_column="0"
+        android:layout_row="1"
+        android:text="@string/ipAddr" />
+
+    <EditText
+        android:id="@+id/port"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_column="2"
+        android:layout_row="1"
+        android:text="@string/port" />
+
+    <ScrollView android:id="@+id/textAreaScroller"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:scrollbars="vertical"
+        android:layout_columnSpan="3"
+        android:layout_column="0"
+        android:layout_row="2">
+
+        <TextView
+            android:id="@+id/serviceLog"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        </TextView>
+
+    </ScrollView>
+
+</GridLayout>
+
+
