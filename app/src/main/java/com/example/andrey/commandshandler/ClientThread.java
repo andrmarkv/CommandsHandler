@@ -1,5 +1,7 @@
 package com.example.andrey.commandshandler;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -8,6 +10,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 /**
  * Created by andrey on 10/05/17.
@@ -24,13 +27,13 @@ public class ClientThread implements Runnable {
     private BufferedOutputStream out;
 
 
-
-    public ClientThread(String tag, String ipAddress, int port){
+    public ClientThread(String tag, String ipAddress, int port) {
         this.tag = tag;
         this.ipAddress = ipAddress;
         this.port = port;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     @Override
     public void run() {
 
@@ -41,9 +44,12 @@ public class ClientThread implements Runnable {
             in = new BufferedInputStream(socket.getInputStream());
             out = new BufferedOutputStream(socket.getOutputStream());
 
+            Log.i(tag, "Starting client thread");
+
             while (!Thread.currentThread().isInterrupted()) {
 
                 try {
+                    //Read length of the message
                     byte[] blen = new byte[4];
                     for (int i = 0; i < 4; i++) {
                         int b = in.read();
@@ -53,8 +59,20 @@ public class ClientThread implements Runnable {
                             break;
                         }
                     }
+                    int len = Utils.byteArrayToInt(blen, 0);
+                    if (len <= 0){
+                        Log.e(tag, "Exiging, got wrong length: " + len);
+                        break;
+                    }
 
+                    //Read body of the message
+                    byte[] buf = new byte[len];
 
+                    int msgId = Utils.byteArrayToInt(buf, 0);
+                    int type = Utils.byteArrayToInt(buf, 4);
+
+                    byte[] msg = Arrays.copyOf(buf, buf.length - 8);
+                    handleMsg(type, msgId, buf);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -66,6 +84,8 @@ public class ClientThread implements Runnable {
         } catch (IOException e1) {
             e1.printStackTrace();
         } finally {
+            Log.i(tag, "Closing client thread");
+
             if (socket != null) {
                 try {
                     socket.close();
@@ -76,6 +96,10 @@ public class ClientThread implements Runnable {
         }
 
 
+    }
+
+    private void handleMsg(int type, int msgId, byte[] buf) {
+        Log.d(tag, "type: " + type + " msgId: " + msgId);
     }
 }
 
