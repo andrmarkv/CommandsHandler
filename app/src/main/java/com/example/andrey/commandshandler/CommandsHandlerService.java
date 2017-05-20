@@ -24,34 +24,34 @@ public class CommandsHandlerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(tag, "CommandsHandlerService onStartCommand " + counter++);
+//        Log.d(tag, "CommandsHandlerService onStartCommand " + counter++);
         addResultValues();
         return Service.START_NOT_STICKY;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(tag, "CommandsHandlerService onBind" + counter++);
+//        Log.d(tag, "CommandsHandlerService onBind" + counter++);
 //        addResultValues();
         return mBinder;
     }
 
     public class MyBinder extends Binder {
         CommandsHandlerService getService() {
-            Log.d(tag, "CommandsHandlerService MyBinder.getService" + counter++);
+//            Log.d(tag, "CommandsHandlerService MyBinder.getService" + counter++);
 
             return CommandsHandlerService.this;
         }
     }
 
     public List<String> getWordList() {
-        Log.d(tag, "CommandsHandlerService getWordList" + counter++);
+//        Log.d(tag, "CommandsHandlerService getWordList" + counter++);
 
         return resultList;
     }
 
     private void addResultValues() {
-        Log.d(tag, "CommandsHandlerService addResultValues" + counter++);
+//        Log.d(tag, "CommandsHandlerService addResultValues" + counter++);
 
         Random random = new Random();
         List<String> input = Arrays.asList("Linux", "Android","iPhone","Windows7" );

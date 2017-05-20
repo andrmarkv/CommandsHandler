@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">CommandsHandler</string>
     <string name="action_settings">Settings</string>
-    <string name="startService">Start Service</string>
-    <string name="stopService">Start Service</string>
-    <string name="checkService">Check Service</string>
-    <string name="ipAddr">pgcontroller</string>
-    <string name="port">12345</string>
+    <string name="startService">Start Client</string>
+    <string name="stopService">Stop Client</string>
+    <string name="checkService">Check Client</string>
+    <string name="ipAddr">pgcontroller.com</string>
+    <string name="port">8003</string>
 </resources>

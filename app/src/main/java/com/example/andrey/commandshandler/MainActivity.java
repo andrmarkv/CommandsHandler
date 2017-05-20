@@ -1,23 +1,17 @@
 package com.example.andrey.commandshandler;
 
 import android.app.Activity;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends Activity implements ServiceConnection {
     public static String TAG = "CommandsHandler";
@@ -25,6 +19,12 @@ public class MainActivity extends Activity implements ServiceConnection {
 
     private TextView slog;
     private ScrollView sview;
+    private HandlerContext context;
+
+    private String serverAddress;
+    private int serverPort;
+    private Client client;
+    private Thread clientThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +35,11 @@ public class MainActivity extends Activity implements ServiceConnection {
         slog = (TextView)findViewById(R.id.serviceLog);
         sview = (ScrollView) findViewById(R.id.textAreaScroller);
 
+        context = new HandlerContext(this, TAG, slog, sview);
     }
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "Activity resume");
         super.onResume();
         Intent intent= new Intent(this, CommandsHandlerService.class);
         bindService(intent, this, Context.BIND_AUTO_CREATE);
@@ -47,62 +47,64 @@ public class MainActivity extends Activity implements ServiceConnection {
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "Activity pause");
         super.onPause();
         unbindService(this);
     }
 
     public void onClickStart(View view) {
         Log.d(TAG, "Activity onClickStart");
-        if (service != null) {
-            service.onStartCommand(null, Service.START_FLAG_REDELIVERY, 2);
-        }
 
-        slog.append("Test Start\n");
-        sview.fullScroll(ScrollView.FOCUS_DOWN);
+        if (client != null && client.isConnected()){
+            Log.d(TAG, "Client is running, not creating");
+        } else {
+            Log.d(TAG, "Creating new client");
+            serverAddress = ((EditText)findViewById(R.id.ipAddr)).getText().toString();
+            String tmp = ((EditText)findViewById(R.id.port)).getText().toString();
+            if (tmp != null && tmp.length() > 0){
+                serverPort = Integer.parseInt(tmp);
+            } else{
+                Log.e(TAG, "Can't parse port value");
+            }
+
+            client = new Client(context, serverAddress, serverPort);
+            clientThread = new Thread(client);
+            clientThread.start();
+
+            context.addLogMessage("New client was started");
+        }
     }
 
     public void onClickStop(View view) {
-        Log.d(TAG, "Activity onClickStop");
+        Log.d(TAG, "Closing client...");
 
-        if (service != null) {
-            service.getWordList();
-
-        } else {
-            Intent service = new Intent(getApplicationContext(), CommandsHandlerService.class);
-            getApplicationContext().startService(service);
+        if (client != null) {
+            client.close();
         }
 
-        slog.append("Test Stop\n");
-        sview.fullScroll(ScrollView.FOCUS_DOWN);
+        client = null;
+
+        context.addLogMessage("Closed client");
     }
 
     public void onClickStatus(View view) {
-        Log.d(TAG, "Activity onClickStatus");
-        if (service != null) {
+        context.addLogMessage("Initiating Test...");
+
+        if (client != null && client.isConnected()) {
+            client.sendTestMsg();
+        } else {
+            context.addLogMessage("Client is not connected!");
         }
-        slog.append("Test Status\n");
-        sview.fullScroll(ScrollView.FOCUS_DOWN);
     }
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder binder) {
-        Log.d(TAG, "Activity onServiceConnected");
-
         CommandsHandlerService.MyBinder b = (CommandsHandlerService.MyBinder) binder;
         service = b.getService();
-        slog.append("Service Connected\n");
-        sview.fullScroll(ScrollView.FOCUS_DOWN);
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        Log.d(TAG, "Activity onServiceDisconnected");
-
         service = null;
-
-        slog.append("Service Disconnected\n");
-        sview.fullScroll(ScrollView.FOCUS_DOWN);
     }
 
 

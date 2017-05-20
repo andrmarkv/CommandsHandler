@@ -41,6 +41,15 @@ public class Utils {
         return value;
     }
 
+    public static int byteArrayToInt2(byte[] b, int offset){
+        int value = 0;
+        for (int i = 0; i < 4; i++) {
+            int shift = (i) * 8;
+            value += (b[offset + i] & 0x000000FF) << shift;
+        }
+        return value;
+    }
+
     public static byte[] shortToByteArray(short val) {
         byte[] ret = new byte[2];
         ret[1] = (byte) (val & 0xFF);
